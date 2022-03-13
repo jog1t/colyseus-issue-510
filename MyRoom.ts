@@ -1,11 +1,22 @@
-import { Schema, type } from "@colyseus/schema";
+import { defineTypes, Schema } from "@colyseus/schema";
 import { Client, Room } from "colyseus";
 
 class State extends Schema {
-  @type("number")
-  number = 0;
-  @type("string")
-  property = "";
+  constructor() {
+    super();
+    this.property = "";
+    this.number = 0;
+  }
+}
+
+defineTypes(State, {
+  property: "string",
+  number: "number",
+});
+
+interface State extends Schema {
+  property: string;
+  number: number;
 }
 
 export class MyRoom extends Room<State> {
