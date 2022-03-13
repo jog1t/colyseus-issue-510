@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>State</h2>
+    <pre id="state"></pre>
+
+    <script src="https://unpkg.com/colyseus.js@^0.14.0/dist/colyseus.js"></script>
+    <script>
+      var client = new Colyseus.Client(`ws:/${window.location.host}/`);
+
+      const $state = document.getElementById("state");
+      const renderState = (json) => {
+        $state.innerText = JSON.stringify(json);
+      };
+
+      client
+        .joinOrCreate("MyRoom")
+        .then((room) => {
+          console.log(room.sessionId, "joined", room.name);
+
+          room.state.onChange = (changes) => {
+            console.log("Room state changed", changes);
+            renderState(room.state.toJSON());
+          };
+
+          setInterval(() => {
+            room.send("ping");
+          }, 1000);
+
+          renderState(room.state.toJSON());
+        })
+        .catch((e) => {
+          console.log("JOIN ERROR", e);
+        });
+    </script>
+  </body>
+</html>
